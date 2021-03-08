@@ -1,0 +1,9 @@
+{
+  "deps": [
+    {
+      "locator": "ponylang/ponycheck",
+      "version": "0.5.4"
+    }
+  ],
+  "info": {}
+}
