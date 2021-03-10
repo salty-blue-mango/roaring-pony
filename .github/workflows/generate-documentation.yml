@@ -15,7 +15,7 @@ jobs:
           site_url: "https://salty-blue-mango.github.io/roaring-pony/"
           library_name: "roaring"
           docs_build_dir: "build/roaring-docs"
-          git_user_name: "TBD"
-          git_user_email: "TBD@example.org"
+          git_user_name: "salty-blue-mango"
+          git_user_email: "nwatts@saltstack.com"
         env:
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}

@@ -14,7 +14,7 @@ jobs:
         uses: ponylang/release-bot-action@0.4.0
         with:
           step: start-a-release
-          git_user_name: "TBD"
-          git_user_email: "TBD@example.org"
+          git_user_name: "salty-blue-mango"
+          git_user_email: "nwatts@saltstack.com"
         env:
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
