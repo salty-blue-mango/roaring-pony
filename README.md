@@ -1,2 +1,3 @@
 # roaring-pony
-Pony implementation of https://github.com/RoaringBitmap
+
+Pony implementation of [RoaringBitmap](https://github.com/RoaringBitmap)

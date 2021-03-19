@@ -9,6 +9,7 @@ actor Main is TestList
   fun tag tests(test: PonyTest) =>
     // register test cases to run here
     test(DummyTest)
+    test(SetTest)
 
     // include the tests of the private API here
     PrivateTests.tests(test)
@@ -18,3 +19,12 @@ class iso DummyTest is UnitTest
 
   fun apply(h: TestHelper) =>
     h.assert_eq[USize](1, 1)
+
+class iso SetTest is UnitTest
+  fun name(): String => "set"
+
+  fun apply(h: TestHelper) =>
+    let roaring = Roaring
+    h.assert_false(roaring.set(U32(1)))
+    // TODO: add this when implemented
+    //h.assert_true(roaring.set(U32(1)))
