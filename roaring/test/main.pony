@@ -26,5 +26,8 @@ class iso SetTest is UnitTest
   fun apply(h: TestHelper) =>
     let roaring = Roaring
     h.assert_false(roaring.set(U32(1)))
-    // TODO: add this when implemented
-    //h.assert_true(roaring.set(U32(1)))
+    h.assert_true(roaring.set(U32(1)))
+    h.assert_false(roaring.set(U32(2)))
+    h.assert_true(roaring.set(U32(2)))
+    h.assert_false(roaring.set(U32(0)))
+    h.assert_false(roaring.set(U32.max_value()))
