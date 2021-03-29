@@ -1,9 +1,21 @@
 {
+  "packages": [],
   "deps": [
     {
       "locator": "ponylang/ponycheck",
       "version": "0.5.4"
+    },
+    {
+      "locator": "github.com/ponylang/ponycheck.git",
+      "version": ""
     }
   ],
-  "info": {}
+  "info": {
+    "description": "",
+    "homepage": "",
+    "license": "",
+    "documentation_url": "",
+    "version": "",
+    "name": ""
+  }
 }
