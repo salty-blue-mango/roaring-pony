@@ -71,13 +71,13 @@ class ref Roaring
     """
     Returns true if the entry was found, false otherwise.
     """
-    let address = (value >> 16).u16()
+    let address = _Bits.address(value)
     match this._get_container(address)
     | (let loc: USize, true) =>
       Debug("container for " + address.string() + " found at " + loc.string())
       try
         let container = _containers(loc)?
-        container.contains(value.u16())
+        container.contains(_Bits.storable(value))
       else
         Debug("invalid location returned from get_container " + loc.string())
         false
@@ -92,13 +92,13 @@ class ref Roaring
     returns true if the provided `value` has already been in the set.
     """
     // TODO this assumes big-endianness
-    let address = (value >> 16).u16()
+    let address = _Bits.address(value)
     match this._get_container(address)
     | (let loc: USize, true) =>
       Debug("container for " + address.string() + " found at " + loc.string())
       try
         let container = _containers(loc)?
-        container.set(value.u16())
+        container.set(_Bits.storable(value))
       else
         Debug("invalid location returned from get_container " + loc.string())
         false
@@ -107,7 +107,7 @@ class ref Roaring
       Debug("container for " + address.string() + " not found, insert at " + loc.string())
       // lets assume get_container will always return valid indices
       try
-        _containers.insert(loc, _Container.create(address, ArrayStore.create(value.u16())))?
+        _containers.insert(loc, _Container.create(address, ArrayStore.create(_Bits.storable(value))))?
       end
       false
     end
