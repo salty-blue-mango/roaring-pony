@@ -1,6 +1,6 @@
 use "ponytest"
 
-primitive PrivateTests is TestList
+primitive PrivateRoaringTests is TestList
   fun tag tests(test: PonyTest) =>
     """
     This is the place for tests of
