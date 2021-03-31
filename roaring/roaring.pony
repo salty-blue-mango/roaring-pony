@@ -32,10 +32,10 @@ class ref ArrayStore
 
   fun contains(value: U16): Bool =>
     """
-    Ryans territory - do not touch!
+    Returns true if the entry was found, false otherwise.
     """
-    false
-
+    (let _, let found) = BinarySearch.apply[U16](value, _buffer)
+    found
 
 type Store is ArrayStore // | BitmapStore | RunStore)
 
@@ -53,9 +53,9 @@ class ref _Container
 
   fun contains(value: U16): Bool =>
     """
-    Ryans territory - do not touch!
+    Returns true if the entry was found, false otherwise.
     """
-    false
+    store.contains(value)
 
 
 class ref Roaring
@@ -68,8 +68,23 @@ class ref Roaring
     _containers = Array[_Container].create(0)
 
   fun contains(value: U32): Bool =>
-    """TODO"""
-    false
+    """
+    Returns true if the entry was found, false otherwise.
+    """
+    let address = (value >> 16).u16()
+    match this._get_container(address)
+    | (let loc: USize, true) =>
+      Debug("container for " + address.string() + " found at " + loc.string())
+      try
+        let container = _containers(loc)?
+        container.contains(value.u16())
+      else
+        Debug("invalid location returned from get_container " + loc.string())
+        false
+      end
+    else
+      false
+    end
 
   fun ref set(value: U32): Bool =>
     """
