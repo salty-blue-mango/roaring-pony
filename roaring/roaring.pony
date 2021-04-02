@@ -30,6 +30,20 @@ class ref ArrayStore
       false
     end
 
+  fun ref unset(value: U16): Bool =>
+    match BinarySearch.apply[U16](value, _buffer)
+    | (let loc: USize, false) =>
+      Debug(value.string() + " not found at " + loc.string())
+      true
+    | (let loc: USize, _) =>
+      try
+        _buffer.delete(loc)?
+      else
+        Debug("Bad loc from _binary_search: " + loc.string())
+      end
+      false
+    end
+
   fun contains(value: U16): Bool =>
     """
     Returns true if the entry was found, false otherwise.
@@ -50,6 +64,9 @@ class ref _Container
 
   fun ref set(value: U16): Bool =>
     store.set(value)
+
+  fun ref unset(value: U16): Bool =>
+    store.unset(value)
 
   fun contains(value: U16): Bool =>
     """
@@ -110,6 +127,28 @@ class ref Roaring
         _containers.insert(loc, _Container.create(address, ArrayStore.create(_Bits.storable(value))))?
       end
       false
+    end
+
+  fun ref unset(value: U32): Bool =>
+    """
+    Removes the given `value` from, the set and
+    returns true if the provided `value` was not in the set.
+    """
+    // TODO this assumes big-endianness
+    let address = _Bits.address(value)
+    match this._get_container(address)
+    | (let loc: USize, true) =>
+      Debug("container for " + address.string() + " found at " + loc.string())
+      try
+        let container = _containers(loc)?
+        container.unset(_Bits.storable(value))
+      else
+        Debug("invalid location returned from get_container " + loc.string())
+        true
+      end
+    | (let loc: USize, _) =>
+      Debug("container for " + address.string() + " not found, not value entered.")
+      true
     end
 
   fun _get_container(address: U16): (USize, Bool) =>

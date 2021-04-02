@@ -11,6 +11,7 @@ actor Main is TestList
     // register test cases to run here
     test(Property1UnitTest[U32](SetContains))
     test(Property1UnitTest[U32](SetTwice))
+    test(Property1UnitTest[U32](SetUnsetContains))
     test(Property1UnitTest[Array[U32]](MediumArraySetContains))
     test(Property1UnitTest[Array[U32]](MediumArraySetTwice))
 
@@ -37,6 +38,17 @@ class SetTwice is Property1[U32]
     let roaring = Roaring
     h.assert_false(roaring.set(arg1))  // Value not previously set
     h.assert_true(roaring.set(arg1))  // Value previously set
+
+class SetUnsetContains is Property1[U32]
+  fun name(): String => "sequence set(), unset(), contains() is all false"
+
+  fun gen(): Generator[U32] => Generators.u32(U32.min_value(), U32.max_value())
+
+  fun property(arg1: U32, h: PropertyHelper) =>
+    let roaring = Roaring
+    h.assert_false(roaring.set(arg1))  // Value not previously set
+    h.assert_false(roaring.unset(arg1))  // Value previous set
+    h.assert_false(roaring.contains(arg1))  // Value no longer present
 
 class MediumArraySetContains is Property1[Array[U32]]
   fun name(): String => "Medium-sized array; contains() is true after set()"
