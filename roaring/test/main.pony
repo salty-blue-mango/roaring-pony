@@ -82,7 +82,7 @@ primitive GenerateMediumUniqueArray
   fun apply(): Generator[Array[U32]] =>
     let min: USize = 4096.mul(2)
     let max: USize = 4096.mul(4)
-    let hashset: Generator[HashSet[U32, HashEq[U32] val] ref] box =
+    let hashset =
       Generators.set_of[U32](where
         gen = Generators.u32(U32.min_value(), U32.max_value()),
         max = max
