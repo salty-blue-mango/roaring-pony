@@ -58,8 +58,8 @@ class FlipTwice is Property1[U32]
 
   fun property(arg1: U32, h: PropertyHelper) =>
     let roaring = Roaring
-    h.assert_false(roaring.set(arg1))  // Value not previously set
-    h.assert_true(roaring.set(arg1))  // Value previously set
+    h.assert_false(roaring.flip(arg1))  // Value not previously set
+    h.assert_true(roaring.flip(arg1))  // Value previously set
 
 class MediumArraySetContains is Property1[Array[U32]]
   fun name(): String => "Medium-sized array; contains() is true after set()"
