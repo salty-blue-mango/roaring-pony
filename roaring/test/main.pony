@@ -11,6 +11,8 @@ actor Main is TestList
     // register test cases to run here
     test(Property1UnitTest[U32](SetContains))
     test(Property1UnitTest[U32](SetTwice))
+    test(Property1UnitTest[U32](FlipContains))
+    test(Property1UnitTest[U32](FlipTwice))
     test(Property1UnitTest[U32](SetUnsetContains))
     test(Property1UnitTest[Array[U32]](MediumArraySetContains))
     test(Property1UnitTest[Array[U32]](MediumArraySetTwice))
@@ -38,6 +40,27 @@ class SetTwice is Property1[U32]
     let roaring = Roaring
     h.assert_false(roaring.set(arg1))  // Value not previously set
     h.assert_true(roaring.set(arg1))  // Value previously set
+
+class FlipContains is Property1[U32]
+  fun name(): String => "contains() is true after flip() from not contains()"
+
+  fun gen(): Generator[U32] => Generators.u32(U32.min_value(), U32.max_value())
+
+  fun property(arg1: U32, h: PropertyHelper) =>
+    let roaring = Roaring
+    h.assert_false(roaring.contains(arg1))  // Not much good as a test if true here
+    h.assert_false(roaring.flip(arg1))  // Value not previously set
+    h.assert_true(roaring.contains(arg1))  // Does contain value
+
+class FlipTwice is Property1[U32]
+  fun name(): String => "flip() is false, then flip is true"
+
+  fun gen(): Generator[U32] => Generators.u32(U32.min_value(), U32.max_value())
+
+  fun property(arg1: U32, h: PropertyHelper) =>
+    let roaring = Roaring
+    h.assert_false(roaring.flip(arg1))  // Value not previously set
+    h.assert_true(roaring.flip(arg1))  // Value previously set
 
 class SetUnsetContains is Property1[U32]
   fun name(): String => "sequence set(), unset(), contains() is all false"

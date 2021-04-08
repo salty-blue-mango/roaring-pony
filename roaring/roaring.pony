@@ -30,6 +30,20 @@ class ref ArrayStore
       false
     end
 
+  fun ref flip(value: U16): Bool =>
+    match BinarySearch.apply[U16](value, _buffer)
+    | (let loc: USize, false) =>
+      set(value)
+      false
+    | (let loc: USize, _) =>
+      try
+        _buffer.delete(loc)?
+      else
+        Debug("Bad loc from _binary_search: " + loc.string())
+      end
+      true
+    end
+
   fun ref unset(value: U16): Bool =>
     match BinarySearch.apply[U16](value, _buffer)
     | (let loc: USize, false) =>
@@ -64,6 +78,9 @@ class ref _Container
 
   fun ref set(value: U16): Bool =>
     store.set(value)
+
+  fun ref flip(value: U16): Bool =>
+    store.flip(value)
 
   fun ref unset(value: U16): Bool =>
     store.unset(value)
@@ -116,6 +133,32 @@ class ref Roaring
       try
         let container = _containers(loc)?
         container.set(_Bits.storable(value))
+      else
+        Debug("invalid location returned from get_container " + loc.string())
+        false
+      end
+    | (let loc: USize, _) =>
+      Debug("container for " + address.string() + " not found, insert at " + loc.string())
+      // lets assume get_container will always return valid indices
+      try
+        _containers.insert(loc, _Container.create(address, ArrayStore.create(_Bits.storable(value))))?
+      end
+      false
+    end
+
+  fun ref flip(value: U32): Bool =>
+    """
+    Flips the value between being in the set or not in the set.
+    Returns true if the value was in the set prior to the flip.
+    """
+    // TODO this assumes big-endianness
+    let address = _Bits.address(value)
+    match this._get_container(address)
+    | (let loc: USize, true) =>
+      Debug("container for " + address.string() + " found at " + loc.string())
+      try
+        let container = _containers(loc)?
+        container.flip(_Bits.storable(value))
       else
         Debug("invalid location returned from get_container " + loc.string())
         false
