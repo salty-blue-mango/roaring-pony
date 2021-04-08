@@ -13,6 +13,7 @@ actor Main is TestList
     test(Property1UnitTest[U32](SetTwice))
     test(Property1UnitTest[U32](FlipContains))
     test(Property1UnitTest[U32](FlipTwice))
+    test(Property1UnitTest[U32](SetUnsetContains))
     test(Property1UnitTest[Array[U32]](MediumArraySetContains))
     test(Property1UnitTest[Array[U32]](MediumArraySetTwice))
 
@@ -61,33 +62,73 @@ class FlipTwice is Property1[U32]
     h.assert_false(roaring.flip(arg1))  // Value not previously set
     h.assert_true(roaring.flip(arg1))  // Value previously set
 
+class SetUnsetContains is Property1[U32]
+  fun name(): String => "sequence set(), unset(), contains() is all false"
+
+  fun gen(): Generator[U32] => Generators.u32(U32.min_value(), U32.max_value())
+
+  fun property(arg1: U32, h: PropertyHelper) =>
+    let roaring = Roaring
+    h.assert_false(roaring.set(arg1))  // Value not previously set
+    h.assert_false(roaring.unset(arg1))  // Value previous set
+    h.assert_false(roaring.contains(arg1))  // Value no longer present
+
 class MediumArraySetContains is Property1[Array[U32]]
   fun name(): String => "Medium-sized array; contains() is true after set()"
 
-  fun gen(): Generator[Array[U32]] => GenerateMediumArray()
+  fun gen(): Generator[Array[U32]] => GenerateMediumUniqueArray()
 
   fun property(arg1: Array[U32], h: PropertyHelper) =>
     let roaring = Roaring
     for value in arg1.values() do
-      roaring.set(value)  // Set value (may have been previously set)
+      h.assert_false(roaring.contains(value))  // Not much good as a test if true here
+      h.assert_false(roaring.set(value))  // Value not previously set
       h.assert_true(roaring.contains(value))  // Does contain value
     end
 
 class MediumArraySetTwice is Property1[Array[U32]]
   fun name(): String => "Medium-sized array; set() returns status of if previously set()"
 
-  fun gen(): Generator[Array[U32]] => GenerateMediumArray()
+  fun gen(): Generator[Array[U32]] => GenerateMediumUniqueArray()
 
   fun property(arg1: Array[U32], h: PropertyHelper) =>
     let roaring = Roaring
     for value in arg1.values() do
-      roaring.set(value)  // Set value (may have been previously set)
+      h.assert_false(roaring.set(value))  // Value not previously set
       h.assert_true(roaring.set(value))  // Value previously set
     end
 
 primitive GenerateMediumArray
   fun apply(): Generator[Array[U32]] =>
     Generators.array_of[U32](where
+      gen = Generators.u32(U32.min_value(), U32.max_value()),
+      min = 4096.mul(2),
+      max = 4096.mul(4))
+
+primitive GenerateMediumUniqueArray
+  """
+  Generate a medium-sized array of unique U32 values.
+
+  TODO: This currently uses a post-fact filter for minimum size which results in
+  longer runtimes to produce a properly sized array. A faster procedure is desired.
+  One possible route is using collections.Range(U32.min_value(), U32.max_value(), <non-looping step size>)
+  followed by a random.shuffle(array)
+  """
+  fun apply(): Generator[Array[U32]] =>
+    let min: USize = 4096.mul(2)
+    let max: USize = 4096.mul(4)
+    let hashset =
+      Generators.set_of[U32](where
         gen = Generators.u32(U32.min_value(), U32.max_value()),
-        min = 4096.mul(2),
-        max = 4096.mul(4))
+        max = max
+      )
+    hashset
+      .filter({ (set) => (set, (min <= set.size())) })
+      .map[Array[U32]]({ 
+        (set) => 
+          let array: Array[U32] = Array[U32].create(set.size())
+          for value in set.values() do
+            array.push(value)
+          end
+          array
+      })
