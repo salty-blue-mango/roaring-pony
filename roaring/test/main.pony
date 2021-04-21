@@ -123,9 +123,10 @@ primitive GenerateMediumUniqueArray
         max = max
       )
     hashset
-      .filter({ (set) => (set, (min <= set.size())) })
-      .map[Array[U32]]({ 
-        (set) => 
+      .filter({ (set) =>
+        (set, (min <= set.size())) })
+      .map[Array[U32]]({
+        (set) =>
           let array: Array[U32] = Array[U32].create(set.size())
           for value in set.values() do
             array.push(value)
