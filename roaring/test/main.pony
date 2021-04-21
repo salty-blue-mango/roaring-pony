@@ -1,6 +1,5 @@
 use "ponytest"
 use "ponycheck"
-use "debug"
 use ".."
 
 actor Main is TestList
@@ -15,8 +14,8 @@ actor Main is TestList
     test(Property1UnitTest[U32](FlipContains))
     test(Property1UnitTest[U32](FlipTwice))
     test(Property1UnitTest[U32](SetUnsetContains))
-    //test(Property1UnitTest[Array[U32]](MediumArraySetContains))
-    //test(Property1UnitTest[Array[U32]](MediumArraySetTwice))
+    test(Property1UnitTest[Array[U32]](MediumArraySetContains))
+    test(Property1UnitTest[Array[U32]](MediumArraySetTwice))
 
     // include the tests of the private API here
     PrivateRoaringTests.tests(test)
@@ -125,7 +124,6 @@ primitive GenerateMediumUniqueArray
       )
     hashset
       .filter({ (set) =>
-        Debug("set size: " + set.size().string())
         (set, (min <= set.size())) })
       .map[Array[U32]]({
         (set) =>
