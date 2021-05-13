@@ -17,8 +17,12 @@ actor Main is BenchmarkList
   be benchmarks(bench: PonyBench) =>
     read_only_benchmarks(bench)
 
+  fun tag all_datasets(): String =>
+    "census-income,census-income_srt,census1881,census1881_srt,dimension_003,dimension_008,dimension_033,uscensus2000,weather_sept_85,weather_sept_85_srt,wikileaks-noquotes,wikileaks-noquotes_srt"
+
   fun print_available_datasets() =>
     _env.err.print("""
+
       Available datasets:
 
       * census-income
@@ -32,16 +36,16 @@ actor Main is BenchmarkList
       * weather_sept_85
       * weather_sept_85_srt
       * wikileaks-noquotes
-      * wikileads-noquotes_srt
+      * wikileaks-noquotes_srt
 
       """)
 
   be read_only_benchmarks(bench: PonyBench) =>
     try
-      // TODO: make this independent of the current diretory
+      // TODO: make this independent of the current directory
       let dataset_base_path = FilePath.create(_env.root as AmbientAuth, "bench/data/real-roaring-dataset")?
-      try
-        let dataset_name = EnvVars(_env.vars)("ROARING_DATASET")?
+      let dataset_names = EnvVars(_env.vars).get_or_else("ROARING_DATASET", this.all_datasets())
+      for dataset_name in dataset_names.split_by(",").values() do
         let stream = _env.err
         try
           let dataset = RoaringDataset(dataset_base_path, stream, dataset_name)?
@@ -51,9 +55,6 @@ actor Main is BenchmarkList
           _env.err.print("Error loading dataset")
           print_available_datasets()
         end
-      else
-        _env.err.print("ROARING_DATASET unset")
-        print_available_datasets()
       end
     else
       _env.err.print("no ambientauth available")
