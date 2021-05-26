@@ -9,6 +9,7 @@ COMPILE_WITH := corral run -- $(PONYC)
 BUILD_DIR ?= build/$(config)
 SRC_DIR ?= $(PACKAGE)
 EXAMPLES_DIR := examples
+BENCH_DIR := bench
 TEST_DIR := $(SRC_DIR)/test
 tests_binary := $(BUILD_DIR)/test
 docs_dir := build/$(PACKAGE)-docs
@@ -29,6 +30,9 @@ SOURCE_FILES := $(shell find $(SRC_DIR) -name *.pony)
 EXAMPLES_SOURCE_FILES := $(shell find $(EXAMPLES_DIR) -name *.pony)
 EXAMPLES_BINARY := $(BUILD_DIR)/examples
 
+BENCH_SOURCE_FILES := $(shell find $(BENCH_DIR)/bench -name *.pony)
+BENCH_BINARY := $(BUILD_DIR)/bench
+
 test: unit-tests build-examples run-examples
 
 unit-tests: $(tests_binary)
@@ -43,9 +47,20 @@ build-examples: $(EXAMPLES_BINARY)
 run-examples: $(EXAMPLES_BINARY)
 	$^
 
+build-bench: $(BENCH_BINARY)
+
+bench: $(BENCH_BINARY)
+	$^
+
 $(EXAMPLES_BINARY): $(BUILD_DIR)/%: $(SOURCE_FILES) $(EXAMPLES_SOURCE_FILES) | $(BUILD_DIR)
 	$(GET_DEPENDENCIES_WITH)
 	$(PONYC) -o $(BUILD_DIR) -b examples $(EXAMPLES_DIR)
+
+$(BENCH_BINARY): $(BUILD_DIR)/%: $(SOURCE_FILES) $(BENCH_SOURCE_FILES) | $(BUILD_DIR)
+	cd bench && \
+		$(GET_DEPENDENCIES_WITH) && \
+		$(PONYC) -o ../$(BUILD_DIR) -b bench $(BENCH_DIR) ; \
+		cd -
 
 clean:
 	$(CLEAN_DEPENDENCIES_WITH)

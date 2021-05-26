@@ -1,0 +1,14 @@
+{
+  "deps": [
+    {
+      "locator": "github.com/mfelsche/ponyzip.git",
+      "version": "v0.1.0"
+    }
+  ],
+  "info": {
+    "description": "benchmarks for roaring",
+    "license": "Apache 2",
+    "version": "0.1.0",
+    "name": "roaring-pony-benchmarks"
+  }
+}
